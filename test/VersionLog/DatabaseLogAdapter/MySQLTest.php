@@ -16,10 +16,9 @@ class MySQLTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped('pdo_mysql extension is needed to run tests');
         }
 
-        $this->pdo = new \PDO('mysql:dbname=mysql_test;host=127.0.0.1', 'root' , '', [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
+        $this->pdo = new \PDO('mysql:dbname=' . DB_NAME . '; host=' . DB_HOST, DB_USER , DB_PASSWORD, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
 
         $this->mysqlObj = new MySQL();
-
     }
 
     public function versionDataProvider()
@@ -45,5 +44,4 @@ class MySQLTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($expected, $this->mysqlObj->getCurrentVersion($this->pdo));
     }
-
 }

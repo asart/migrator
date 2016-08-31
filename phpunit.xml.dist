@@ -21,7 +21,7 @@
     </filter>
 
     <php>
-        <env name="DB_NAME" value="mysql_test"/>
+        <const name="DB_NAME" value="mysql_test"/>
         <const name="DB_HOST" value="127.0.0.1"/>
         <const name="DB_USER" value="root"/>
         <const name="DB_PASSWORD" value=""/>
