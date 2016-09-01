@@ -16,8 +16,12 @@ class MySQLTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped('pdo_mysql extension is needed to run tests');
         }
 
-        $this->pdo = new \PDO('mysql:dbname=' . DB_NAME . '; host=' . DB_HOST, DB_USER, DB_PASSWORD,
-            [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
+        $this->pdo = new \PDO(
+            'mysql:dbname=' . DB_NAME . '; host=' . DB_HOST,
+            DB_USER,
+            DB_PASSWORD,
+            [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
+        );
 
         $this->mysqlObj = new MySQL();
     }
