@@ -3,6 +3,7 @@ namespace Tests\VersionLog\DatabaseLogAdapter;
 
 use Migrator\VersionLog\DatabaseLogAdapter\MySQL;
 use PDO;
+use PDOException;
 
 class MySQLTest extends \PHPUnit_Framework_TestCase
 {
@@ -16,12 +17,22 @@ class MySQLTest extends \PHPUnit_Framework_TestCase
             $this->markTestSkipped('pdo_mysql extension is needed to run tests');
         }
 
-        $this->pdo = new \PDO(
-            'mysql:dbname=' . DB_NAME . '; host=' . DB_HOST,
-            DB_USER,
-            DB_PASSWORD,
-            [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
-        );
+        try {
+            $this->pdo = new PDO(
+                'mysql:dbname=' . DB_NAME . '; host=' . DB_HOST,
+                DB_USER,
+                DB_PASSWORD,
+                [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
+            );
+        } catch (PDOException $e) {
+            $this->markTestSkipped(
+                'this test using travis mysql with arg
+                DB_NAME = mysql_test,
+                DB_HOST = 127.0.0.1,
+                DB_USER = root,
+                DB_PASSWORD = "" '
+            );
+        }
 
         $this->mysqlObj = new MySQL();
     }
