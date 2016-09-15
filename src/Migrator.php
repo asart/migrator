@@ -25,9 +25,9 @@ class Migrator
 
     /**
      * Migration constructor.
-     * @param PDO                      $pdo
+     * @param PDO $pdo
      * @param MigrationReaderInterface $migration_reader
-     * @param VersionLogInterface      $version_log
+     * @param VersionLogInterface $version_log
      */
     public function __construct(PDO $pdo, MigrationReaderInterface $migration_reader, VersionLogInterface $version_log)
     {
