@@ -3,11 +3,13 @@ namespace Migrator\Console;
 
 use Migrator\Command\MigrateCommand;
 use Migrator\Command\StatusCommand;
+use Migrator\Command\CreateCommand;
 use Migrator\Factory\Config\JSONConfigProvider;
 use Migrator\Factory\Config\PHPConfigProvider;
 use Migrator\Factory\Config\YAMLConfigProvider;
 use Migrator\Factory\ConfigurableFactory;
 use Migrator\Factory\FactoryInterface;
+use Migrator\MigrationWriter\MigrationWriter;
 use Symfony\Component\Console\Application as ConsoleApplication;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -37,6 +39,7 @@ class Application extends ConsoleApplication
         $this->addCommands([
             new StatusCommand(),
             new MigrateCommand(),
+            new CreateCommand(),
         ]);
     }
 
@@ -59,6 +62,10 @@ class Application extends ConsoleApplication
                     $provider = new JSONConfigProvider($config_file);
             }
             $this->factory = new ConfigurableFactory($provider);
+
+            $command = $this->get('create');
+
+            $command->setWriter(new MigrationWriter($provider));
         }
 
         return parent::doRun($input, $output);
