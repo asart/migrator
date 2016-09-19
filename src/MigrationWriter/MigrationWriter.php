@@ -103,7 +103,6 @@ class MigrationWriter implements MigrationWriterInterface
             $max = 0;
             $keyMax = null;
             foreach ($this->up as $key => $value) {
-
                 if ($value['version'] > $max) {
                     $max = $value['version'];
                     $keyMax = $key;
