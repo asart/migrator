@@ -100,10 +100,8 @@ class MigrationWriter implements MigrationWriterInterface
         }
 
         if (!empty($this->up)) {
-
             $max = 0;
             $keyMax = null;
-
             foreach ($this->up as $key => $value) {
 
                 if ($value['version'] > $max) {
