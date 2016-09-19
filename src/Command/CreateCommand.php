@@ -5,6 +5,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Migrator\MigrationWriterInterface;
+use Exception;
 
 /**
  * Class Status
@@ -20,7 +21,7 @@ class CreateCommand extends BaseCommand
     /**
      * @param MigrationWriterInterface $writer
      */
-    public function setWriter($writer)
+    public function setWriter(MigrationWriterInterface $writer)
     {
         $this->writer = $writer;
     }
@@ -42,10 +43,12 @@ class CreateCommand extends BaseCommand
     {
         $database = $input->getArgument('database');
 
-        if ($this->writer->createNextVersionUp($database)) {
-            $output->writeln('success created migration ' . $this->writer->getNewMigration());
-        } else {
-            $output->writeln('create migration filed');
+        try {
+            $this->writer->createNextVersionUp($database);
+            $output->writeln('success created migration ' . $this->writer->getMigrationUp());
+            $output->writeln('success created migration ' . $this->writer->getMigrationDown());
+        } catch (Exception $writerException) {
+            echo $writerException->getMessage(), "\n";
         }
     }
 }

@@ -4,6 +4,7 @@ namespace Migrator\MigrationWriter;
 use Migrator\Factory\Config\ProviderInterface;
 use DirectoryIterator;
 use Migrator\MigrationWriterInterface;
+use Exception;
 
 class MigrationWriter implements MigrationWriterInterface
 {
@@ -20,7 +21,12 @@ class MigrationWriter implements MigrationWriterInterface
     /**
      * @var string
      */
-    private $newMigration;
+    private $migrationUp;
+
+    /**
+     * @var string
+     */
+    private $migrationDown;
 
     /**
      * @param ProviderInterface $provider
@@ -34,28 +40,48 @@ class MigrationWriter implements MigrationWriterInterface
     {
         $folder = $this->provider->getConfig($db_name)["migrations"];
 
-        $max = 1 + $this->getMaxVersion($folder);
+        $info = $this->getMaxVersion($folder);
 
-        $this->newMigration = '00' . $max . '.up.' . time() . '.sql';
+        $max = $info['version'] + 1;
 
-        if (!file_exists($folder . '/' . $this->newMigration)) {
-            file_put_contents($folder . '/' . $this->newMigration, '');
-            return true;
+        $time = time();
+
+        $this->migrationUp = $info['character'] . $max . '.up.' . $time . '.sql';
+        $this->migrationDown = $info['character'] . $max . '.down.' . $time . '.sql';
+
+        if (!file_exists($folder . '/' . $this->migrationUp)) {
+            file_put_contents($folder . '/' . $this->migrationUp, '');
         } else {
-            return false;
+            throw new Exception('Create migration Up failed');
         }
+
+        if (!file_exists($folder . '/' . $this->migrationDown)) {
+            file_put_contents($folder . '/' . $this->migrationDown, '');
+        } else {
+            throw new Exception('Create migration Down failed');
+        }
+
+        return true;
     }
 
     /**
      * @return string
      */
-    public function getNewMigration()
+    public function getMigrationUp()
     {
-        return $this->newMigration;
+        return $this->migrationUp;
     }
 
     /**
-     * @return integer max current version in database .
+     * @return string
+     */
+    public function getMigrationDown()
+    {
+        return $this->migrationDown;
+    }
+
+    /**
+     * @return array max current version in database .
      * @param string $folder Folder to read from
      */
     private function getMaxVersion($folder)
@@ -64,16 +90,35 @@ class MigrationWriter implements MigrationWriterInterface
             if ($file->isDot()) {
                 continue;
             }
-            if ($this->match($file->getFilename(), $version)) {
-                $this->up[] = (int)$version;
+            if ($this->match($file->getFilename(), $version, $character)) {
+                $matchInfo = [
+                    'version' => $version,
+                    'character' => $character
+                ];
+                $this->up[] = $matchInfo;
             }
         }
 
         if (!empty($this->up)) {
-            return max($this->up);
+
+            $max = 0;
+            $keyMax = null;
+
+            foreach ($this->up as $key => $value) {
+
+                if ($value['version'] > $max) {
+                    $max = $value['version'];
+                    $keyMax = $key;
+                }
+            }
+
+            return $this->up[$keyMax];
         }
 
-        return 0;
+        return [
+            'version' => 1,
+            'character' => '000'
+        ];
     }
 
     /**
@@ -81,12 +126,18 @@ class MigrationWriter implements MigrationWriterInterface
      * If matches, sets $version and $direction variables
      * @param string $filename
      * @param int $version Matched version number
+     * @param int $character character in migration file number
      * @return bool
      */
-    private function match($filename, &$version)
+    private function match($filename, &$version, &$character)
     {
         if (preg_match('/^(?<version>\d+)\.(?<dir>up)(\..+)?\.sql$/', $filename, $match)) {
             $version = (int)$match['version'];
+
+            if (preg_match('/^(?<null>[0]+)/', $match['version'], $matches)) {
+                $character = $matches['null'];
+            }
+
             return true;
         }
         return false;

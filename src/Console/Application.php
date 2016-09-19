@@ -37,9 +37,9 @@ class Application extends ConsoleApplication
         }
         parent::__construct('Migrator', self::VERSION);
         $this->addCommands([
-            new StatusCommand(),
-            new MigrateCommand(),
             new CreateCommand(),
+            new MigrateCommand(),
+            new StatusCommand(),
         ]);
     }
 
