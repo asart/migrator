@@ -42,13 +42,8 @@ class CreateCommand extends BaseCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $database = $input->getArgument('database');
-
-        try {
-            $this->writer->createNextVersionUp($database);
-            $output->writeln('success created migration ' . $this->writer->getMigrationUp());
-            $output->writeln('success created migration ' . $this->writer->getMigrationDown());
-        } catch (Exception $writerException) {
-            echo $writerException->getMessage(), "\n";
-        }
+        $this->writer->createNextVersionUp($database);
+        $output->writeln('success created migration ' . $this->writer->getMigrationUp());
+        $output->writeln('success created migration ' . $this->writer->getMigrationDown());
     }
 }

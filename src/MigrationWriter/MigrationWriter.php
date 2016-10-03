@@ -36,6 +36,11 @@ class MigrationWriter implements MigrationWriterInterface
         $this->provider = $provider;
     }
 
+    /**
+     * @param string $db_name
+     * @throws Exception
+     * @return boolean
+     */
     public function createNextVersionUp($db_name)
     {
         $folder = $this->provider->getConfig($db_name)["migrations"];
@@ -81,8 +86,8 @@ class MigrationWriter implements MigrationWriterInterface
     }
 
     /**
-     * @return array max current version in database .
      * @param string $folder Folder to read from
+     * @return array max current version in database
      */
     private function getMaxVersion($folder)
     {
