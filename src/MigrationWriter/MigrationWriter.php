@@ -56,7 +56,6 @@ class MigrationWriter implements MigrationWriterInterface
         }
 
         return true;
-
     }
 
     /**
